@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Value / Yield Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h2>Value / Yield Calculator</h2>
+
+<select id="calculatorType" onchange="toggleCalculator()">
+  <option value="value">Value Calculator</option>
+  <option value="yield">Yield Calculator</option>
+</select>
+
+<!-- VALUE CALCULATOR -->
+<div id="valueCalc">
+
+  <div class="box">
+    <h3>Previous Month</h3>
+
+    <div class="input-row">
+      <label>Value:</label>
+      <input id="value" type="text" placeholder="Value" oninput="formatValue(this)">
+    </div>
+
+    <div class="input-row">
+      <label>YTD %:</label>
+      <input id="ytd" type="number" placeholder="YTD %">
+    </div>
+
+    <div class="input-row">
+      <label>ITD %:</label>
+      <input id="itd" type="number" placeholder="ITD %">
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Current Month</h3>
+    <div class="input-row">
+      <label>MTD %:</label>
+      <input id="mtd" type="number" placeholder="MTD %">
+    </div>
+  </div>
+
+  <button onclick="calculateValue()">Calculate</button>
+  <button onclick="recalculateValue()">Recalculate</button>
+  <button class="secondary" onclick="copyToYield()">Copy to Yield Calculator</button>
+
+  <div class="results">
+    <h3>Results</h3>
+    <div class="results-grid">
+      <div>New Value:</div><div id="newValue">-</div>
+      <button class="copy-btn" onclick="copyValue('newValue', this)">Copy</button>
+
+      <div>New YTD:</div><div id="newYTD">-</div>
+      <button class="copy-btn" onclick="copyValue('newYTD', this)">Copy</button>
+
+      <div>New ITD:</div><div id="newITD">-</div>
+      <button class="copy-btn" onclick="copyValue('newITD', this)">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- YIELD CALCULATOR -->
+<div id="yieldCalc" style="display:none">
+
+  <div class="box">
+    <h3>Balances</h3>
+
+    <div class="input-row">
+      <label>Opening:</label>
+      <input id="openBal" type="number">
+    </div>
+
+    <div class="input-row">
+      <label>Year End:</label>
+      <input id="yearEndBal" type="number">
+    </div>
+
+    <div class="input-row">
+      <label>Previous:</label>
+      <input id="prevBal" type="number">
+    </div>
+
+    <div class="input-row">
+      <label>Current:</label>
+      <input id="currBal" type="number">
+    </div>
+  </div>
+
+  <button onclick="calculateYield()">Calculate</button>
+  <button class="secondary" onclick="copyToValue()">Copy to Value Calculator</button>
+
+  <div class="results">
+    <h3>Results</h3>
+    <div class="results-grid">
+      <div>MTD:</div><div id="yieldMTD">-</div>
+      <button class="copy-btn" onclick="copyValue('yieldMTD', this)">Copy</button>
+
+      <div>YTD:</div><div id="yieldYTD">-</div>
+      <button class="copy-btn" onclick="copyValue('yieldYTD', this)">Copy</button>
+
+      <div>ITD:</div><div id="yieldITD">-</div>
+      <button class="copy-btn" onclick="copyValue('yieldITD', this)">Copy</button>
+    </div>
+  </div>
+</div>
+
+<button onclick="resetAll()">Reset Calculators</button>
+
+<script src="script.js"></script>
+</body>
+</html>
