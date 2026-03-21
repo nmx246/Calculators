@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Value / Yield Calculator</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -17,7 +17,6 @@
         <option value="yield">Calculate Yield</option>
     </select>
 
-    <!-- VALUE CALCULATOR -->
     <div id="valueCalc">
 
         <div class="box">
@@ -30,12 +29,12 @@
 
             <div class="input-row">
                 <label>YTD %:</label>
-                <input id="ytd" type="number" placeholder="Year to Date">
+                <input id="ytd" type="number" step="any" placeholder="Year to Date">
             </div>
 
             <div class="input-row">
                 <label>ITD %:</label>
-                <input id="itd" type="number" placeholder="Inception to Date">
+                <input id="itd" type="number" step="any" placeholder="Inception to Date">
             </div>
         </div>
 
@@ -43,7 +42,7 @@
             <h3>Current Month</h3>
             <div class="input-row">
                 <label>MTD %:</label>
-                <input id="mtd" type="number" placeholder="Month to Date">
+                <input id="mtd" type="number" step="any" placeholder="Month to Date">
             </div>
         </div>
 
@@ -54,6 +53,10 @@
         <div class="results">
             <h3>Results</h3>
             <div class="results-grid">
+                <div>MTD:</div>
+                <div id="newMTDResult">-</div>
+                <button class="copy-btn" onclick="copyValue('newMTDResult', this)">Copy</button>
+
                 <div>New Value:</div>
                 <div id="newValue">-</div>
                 <button class="copy-btn" onclick="copyValue('newValue', this)">Copy</button>
@@ -69,7 +72,6 @@
         </div>
     </div>
 
-    <!-- YIELD CALCULATOR -->
     <div id="yieldCalc" style="display:none">
 
         <div class="box">
@@ -77,22 +79,22 @@
 
             <div class="input-row">
                 <label>Opening:</label>
-                <input id="openBal" type="number" placeholder="Opening Balance">
+                <input id="openBal" type="text" placeholder="Opening Balance" oninput="formatValue(this)">
             </div>
 
             <div class="input-row">
                 <label>Year End:</label>
-                <input id="yearEndBal" type="number" placeholder="Year End Balance">
+                <input id="yearEndBal" type="text" placeholder="Year End Balance" oninput="formatValue(this)">
             </div>
 
             <div class="input-row">
                 <label>Previous:</label>
-                <input id="prevBal" type="number" placeholder="Previous Month Balance">
+                <input id="prevBal" type="text" placeholder="Previous Month Balance" oninput="formatValue(this)">
             </div>
 
             <div class="input-row">
                 <label>Current:</label>
-                <input id="currBal" type="number" placeholder="Current Month Balance">
+                <input id="currBal" type="text" placeholder="Current Month Balance" oninput="formatValue(this)">
             </div>
         </div>
 
@@ -119,7 +121,7 @@
 
     <button onclick="resetAll()">Reset Calculators</button>
 
-    <script src="index.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
