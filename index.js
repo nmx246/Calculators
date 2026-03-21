@@ -2,72 +2,87 @@ function toggleCalculator() {
     const type = document.getElementById("calculatorType").value;
     document.getElementById("valueCalc").style.display = type === "value" ? "block" : "none";
     document.getElementById("yieldCalc").style.display = type === "yield" ? "block" : "none";
+    document.getElementById("pageTitle").innerText = type === "value" ? "Value Calculator" : "Yield Calculator";
+}
 
-    // 👇 תוספת יחידה
-    document.getElementById("pageTitle").innerText =
-        type === "value" ? "Value Calculator" : "Yield Calculator";
+function formatWithCommas(value) {
+    if (!value && value !== 0) return "";
+    let clean = value.toString().replace(/[^0-9.]/g, "");
+    let parts = clean.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts[1] !== undefined ? parts[0] + "." + parts[1].slice(0, 2) : parts[0];
 }
 
 function formatValue(input) {
-    let raw = input.value.replace(/[^0-9.]/g, "");
-    const parts = raw.split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    input.value = parts[1] ? `${parts[0]}.${parts[1].slice(0, 2)}` : parts[0];
+    let originalValue = input.value;
+    input.value = formatWithCommas(originalValue);
+}
+
+function parseFormattedNumber(val) {
+    if (!val) return 0;
+    return Number(val.toString().replace(/,/g, ""));
 }
 
 function calculateValue() {
-    const val = Number(document.getElementById("value").value.replace(/,/g, ""));
-    const mtd = Number(document.getElementById("mtd").value) / 100;
+    const rawMtdInput = document.getElementById("mtd").value;
+    const val = parseFormattedNumber(document.getElementById("value").value);
+    const mtd = Number(rawMtdInput) / 100;
     const ytd = Number(document.getElementById("ytd").value) / 100;
     const itd = Number(document.getElementById("itd").value) / 100;
 
-    document.getElementById("newValue").innerText = (!isNaN(val) && !isNaN(mtd)) ? (val * (1 + mtd)).toFixed(2) : "-";
-    document.getElementById("newYTD").innerText = (!isNaN(mtd) && !isNaN(ytd)) ? (((1 + ytd) * (1 + mtd) - 1) * 100).toFixed(2) : "-";
-    document.getElementById("newITD").innerText = (!isNaN(mtd) && !isNaN(itd)) ? (((1 + itd) * (1 + mtd) - 1) * 100).toFixed(2) : "-";
+    if (!isNaN(val) && !isNaN(mtd) && rawMtdInput !== "") {
+        const resultValue = val * (1 + mtd);
+        
+        // הצגת ה-MTD בתוצאות
+        document.getElementById("newMTDResult").innerText = Number(rawMtdInput).toFixed(2);
+        
+        document.getElementById("newValue").innerText = resultValue.toLocaleString("en-US", {
+            minimumFractionDigits: 2, maximumFractionDigits: 2
+        });
+        document.getElementById("newYTD").innerText = (((1 + ytd) * (1 + mtd) - 1) * 100).toFixed(2);
+        document.getElementById("newITD").innerText = (((1 + itd) * (1 + mtd) - 1) * 100).toFixed(2);
+    } else {
+        document.getElementById("newMTDResult").innerText = "-";
+        document.getElementById("newValue").innerText = "-";
+        document.getElementById("newYTD").innerText = "-";
+        document.getElementById("newITD").innerText = "-";
+    }
 }
 
 function recalculateValue() {
     const newVal = document.getElementById("newValue").innerText;
-    if (newVal !== "-") document.getElementById("value").value = Number(newVal).toLocaleString("en-US");
-
+    if (newVal !== "-") document.getElementById("value").value = newVal;
+    
     const newYTD = document.getElementById("newYTD").innerText;
     if (newYTD !== "-") document.getElementById("ytd").value = newYTD;
 
     const newITD = document.getElementById("newITD").innerText;
     if (newITD !== "-") document.getElementById("itd").value = newITD;
 
-    document.getElementById("newValue").innerText = "-";
-    document.getElementById("newYTD").innerText = "-";
-    document.getElementById("newITD").innerText = "-";
-
     calculateValue();
 }
 
 function calculateYield() {
-    const open = Number(document.getElementById("openBal").value);
-    const yearEnd = Number(document.getElementById("yearEndBal").value);
-    const prev = Number(document.getElementById("prevBal").value);
-    const curr = Number(document.getElementById("currBal").value);
+    const open = parseFormattedNumber(document.getElementById("openBal").value);
+    const yearEnd = parseFormattedNumber(document.getElementById("yearEndBal").value);
+    const prev = parseFormattedNumber(document.getElementById("prevBal").value);
+    const curr = parseFormattedNumber(document.getElementById("currBal").value);
 
-    document.getElementById("yieldMTD").innerText = (!isNaN(prev) && !isNaN(curr) && prev !== 0) ? ((curr / prev - 1) * 100).toFixed(2) : "-";
-    document.getElementById("yieldYTD").innerText = (!isNaN(yearEnd) && !isNaN(curr) && yearEnd !== 0) ? ((curr / yearEnd - 1) * 100).toFixed(2) : "-";
-    document.getElementById("yieldITD").innerText = (!isNaN(open) && !isNaN(curr) && open !== 0) ? ((curr / open - 1) * 100).toFixed(2) : "-";
+    document.getElementById("yieldMTD").innerText = (prev !== 0) ? ((curr / prev - 1) * 100).toFixed(2) : "-";
+    document.getElementById("yieldYTD").innerText = (yearEnd !== 0) ? ((curr / yearEnd - 1) * 100).toFixed(2) : "-";
+    document.getElementById("yieldITD").innerText = (open !== 0) ? ((curr / open - 1) * 100).toFixed(2) : "-";
 }
 
 function copyToValue() {
     document.getElementById("calculatorType").value = "value";
     toggleCalculator();
 
-    const mtdVal = document.getElementById("yieldMTD").innerText;
-    const ytdVal = document.getElementById("yieldYTD").innerText;
-    const itdVal = document.getElementById("yieldITD").innerText;
-
-    if (mtdVal !== "-") document.getElementById("mtd").value = mtdVal;
-    if (ytdVal !== "-") document.getElementById("ytd").value = ytdVal;
-    if (itdVal !== "-") document.getElementById("itd").value = itdVal;
+    document.getElementById("mtd").value = document.getElementById("yieldMTD").innerText !== "-" ? document.getElementById("yieldMTD").innerText : "";
+    document.getElementById("ytd").value = document.getElementById("yieldYTD").innerText !== "-" ? document.getElementById("yieldYTD").innerText : "";
+    document.getElementById("itd").value = document.getElementById("yieldITD").innerText !== "-" ? document.getElementById("yieldITD").innerText : "";
 
     const currVal = document.getElementById("currBal").value;
-    if (currVal) document.getElementById("value").value = Number(currVal).toLocaleString("en-US");
+    if (currVal) document.getElementById("value").value = formatWithCommas(currVal);
 }
 
 function copyToYield() {
@@ -75,45 +90,26 @@ function copyToYield() {
     toggleCalculator();
 
     const mtdVal = document.getElementById("mtd").value;
-    const newYTD = document.getElementById("newYTD").innerText;
-    const newITD = document.getElementById("newITD").innerText;
-
     if (mtdVal) document.getElementById("yieldMTD").innerText = mtdVal;
-    if (newYTD !== "-") document.getElementById("yieldYTD").innerText = newYTD;
-    if (newITD !== "-") document.getElementById("yieldITD").innerText = newITD;
 
-    const val = document.getElementById("value").value.replace(/,/g, "");
-    if (val) document.getElementById("prevBal").value = val;
-    const newVal = document.getElementById("newValue").innerText;
-    if (newVal !== "-") document.getElementById("currBal").value = newVal;
+    document.getElementById("prevBal").value = document.getElementById("value").value;
+    document.getElementById("currBal").value = document.getElementById("newValue").innerText !== "-" ? document.getElementById("newValue").innerText : "";
+    
+    calculateYield();
 }
 
 function copyValue(elementId, btn) {
-    const text = document.getElementById(elementId).innerText;
+    let text = document.getElementById(elementId).innerText;
     if (!text || text === "-") return;
-
-    navigator.clipboard.writeText(text);
-
+    navigator.clipboard.writeText(text.replace(/,/g, "")); 
+    
     const originalText = btn.innerText;
     btn.innerText = "Copied";
     btn.disabled = true;
-
-    setTimeout(() => {
-        btn.innerText = originalText;
-        btn.disabled = false;
-    }, 1200);
+    setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 1200);
 }
 
 function resetAll() {
-    const selectedType = document.getElementById("calculatorType").value;
-    localStorage.setItem("calculatorType", selectedType);
-    location.reload();
+    document.querySelectorAll("input").forEach(i => i.value = "");
+    document.querySelectorAll(".results-grid div[id]").forEach(el => el.innerText = "-");
 }
-
-window.addEventListener("load", () => {
-    const savedType = localStorage.getItem("calculatorType");
-    if (savedType) {
-        document.getElementById("calculatorType").value = savedType;
-        toggleCalculator();
-    }
-});
